@@ -11,21 +11,24 @@ router.post('/register', (req, res) => {
   }
   const user = new UserModel({
     username: req.body.username,
+    email: req.body.email,
     password: req.body.password,
   });
   user.save((error) => {
-    if (error) return res.status(500).send('db error');
+    if (error) return res.status(500).send(error);
     return res.status(200).send('registration success');
   });
 });
 
 router.get('/', (req, res) => {
-  console.log('Query parameterek', req.query);
-  console.log(req.session.passport.user);
   if (req.isAuthenticated()) {
     return res.status(200).send('Hello World');
   }
   return res.status(403).send('You are not welcome here');
+});
+
+router.get('/users', (req, res) => {
+  UserModel.find({}, (err, users) => res.send(users));
 });
 
 router.post('/logout', (req, res) => {

@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -14,21 +15,20 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('save', function (next) {
   const user = this;
-  if (user.isModified('password')) {
-    bcrypt.genSalt(10, (error, salt) => {
-      if (error) {
-        return next(error);
+  if (!user.isModified('password')) return next();
+
+  bcrypt.genSalt(10, (genSaltError, salt) => {
+    if (genSaltError) {
+      return next(genSaltError);
+    }
+    bcrypt.hash(user.password, salt, (hashError, hash) => {
+      if (hashError) {
+        return next(hashError);
       }
-      bcrypt.hash(user.password, salt, (error, hash) => {
-        if (error) {
-          return next(error);
-        }
-        user.password = hash;
-        return next();
-      });
+      user.password = hash;
+      return next();
     });
-  }
-  return next();
+  });
 });
 
 userSchema.methods.comparePasswords = function (password, next) {

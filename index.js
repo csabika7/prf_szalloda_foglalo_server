@@ -10,8 +10,10 @@ const expressSession = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const cors = require('cors');
-const UserModel = require('./usermodel');
+require('./usermodel');
 require('./hotelmodel');
+
+const UserModel = mongoose.model('user');
 
 const app = express();
 
@@ -36,10 +38,10 @@ passport.deserializeUser((user, done) => {
 
 passport.use('local',
   new LocalStrategy(((username, password, done) => {
-    UserModel.findOne({ username }, (err, user) => {
-      if (!user || err) return done('cannot get user', false);
-      user.comparePasswords(password, (err, isMatch) => {
-        if (err || !isMatch) return done('password incorrect', false);
+    UserModel.findOne({ username }, (findError, user) => {
+      if (!user || findError) return done('cannot get user', false);
+      user.comparePasswords(password, (compareError, isMatch) => {
+        if (compareError || !isMatch) return done('password incorrect', false);
         return done(null, user);
       });
     });
