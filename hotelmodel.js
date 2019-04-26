@@ -6,10 +6,10 @@ const hotelSchema = new mongoose.Schema({
     type: String, unique: true, required: true,
   },
   stars: { type: Number, required: true },
-  extra_features: { type: Array },
+  extra_features: { type: [String] },
   rooms: [{
     number_of_beds: { type: Number },
-    extra_features: { type: Array },
+    extra_features: { type: [String] },
     available: { type: Number },
     guests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
   }],

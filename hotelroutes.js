@@ -17,12 +17,27 @@ router.get('/hotel/list', (req, res) => {
 });
 
 router.get('/hotel/find', (req, res) => {
-  HotelModel.find(
-    {
-      name: { $regex: req.body.name, $options: 'i' },
-      extra_features: req.body.extra_features,
-    },
-  );
+  const conditions = {};
+  if (req.body.name) {
+    conditions.name = { $regex: req.body.name, $options: 'i' };
+  }
+  if (req.body.extra_features && req.body.extra_features.length > 0) {
+    conditions.extra_features = { $all: req.body.extra_features };
+  }
+  if (req.body.room) {
+    const { room } = req.body;
+    if (room.number_of_beds) {
+      conditions['rooms.number_of_beds'] = { $eq: room.number_of_beds };
+    }
+    if (room.extra_features && room.extra_features.length > 0) {
+      conditions['rooms.extra_features'] = { $all: room.extra_features };
+    }
+  }
+  console.log(conditions);
+  HotelModel.find(conditions, (error, hotels) => {
+    if (error) return res.status(500).send(error);
+    return res.status(200).send(hotels);
+  });
 });
 
 router.put('/hotel/add', (req, res) => {
@@ -60,8 +75,8 @@ router.post('/hotel/:hotelId/room/:roomId/reserve', (req, res) => {
         return res.status(400).send({ message: 'all rooms are reserved' });
       }
       roomToReserve.guests.push(mongoose.Types.ObjectId(req.session.passport.user._id));
-      HotelModel.updateOne({ _id: req.params.hotelId }, hotel, (updateError) => {
-        if (updateError) return res.status(500).send({ message: 'error during reserving room for new guest' });
+      hotel.save((saveError) => {
+        if (saveError) return res.status(500).send({ message: 'error during reserving room for new guest' });
         return res.status(200).send({ message: 'reserved' });
       });
     });
