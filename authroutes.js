@@ -5,9 +5,9 @@ const mongoose = require('mongoose');
 const UserModel = mongoose.model('user');
 const router = express.Router();
 
-router.post('/register', (req, res) => {
+router.post('/user/register', (req, res) => {
   if (!req.body.username || !req.body.password) {
-    return res.status(404).send('username or password missing');
+    return res.status(404).send({ message: 'Username or password missing' });
   }
   const user = new UserModel({
     username: req.body.username,
@@ -15,44 +15,37 @@ router.post('/register', (req, res) => {
     password: req.body.password,
   });
   user.save((error) => {
-    if (error) return res.status(500).send(error);
-    return res.status(200).send('registration success');
+    if (error) return res.status(500).send({ message: error });
+    return res.status(200).send({ message: 'Registration success' });
   });
 });
 
-router.get('/', (req, res) => {
-  if (req.isAuthenticated()) {
-    return res.status(200).send('Hello World');
-  }
-  return res.status(403).send('You are not welcome here');
-});
-
-router.get('/users', (req, res) => {
+router.get('/user/list', (req, res) => {
   UserModel.find({}, (err, users) => res.send(users));
 });
 
-router.post('/logout', (req, res) => {
+router.post('/user/logout', (req, res) => {
   if (req.isAuthenticated()) {
     req.logout();
-    res.status(200).send('You have been logged out');
+    res.status(200).send({ message: 'You have been logged out' });
   } else {
-    res.status(403).send('You have to log in first');
+    res.status(403).send({ message: 'You have to log in first' });
   }
 });
 
-router.post('/login', (req, res) => {
+router.post('/user/login', (req, res) => {
   if (req.body.username && req.body.password) {
     passport.authenticate('local', (error, username) => {
       if (error) {
-        return res.status(403).send(error);
+        return res.status(403).send({ message: error });
       }
       req.logIn(username, (error) => {
-        if (error) return res.status(500).send(error);
-        return res.status(200).send('login successful');
+        if (error) return res.status(500).send({ message: error });
+        return res.status(200).send({ message: 'login successful' });
       });
     })(req, res);
   } else {
-    return res.status(403).send('username and password required');
+    return res.status(403).send({ messgage: 'username, password required' });
   }
 });
 
