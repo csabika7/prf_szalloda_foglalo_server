@@ -2,7 +2,7 @@
 const express = require('express');
 const passport = require('passport');
 const mongoose = require('mongoose');
-const date = require('date-and-time');
+const moment = require('moment');
 
 const HotelModel = mongoose.model('hotel');
 const router = express.Router();
@@ -47,6 +47,15 @@ router.get('/hotel/find', (req, res) => {
 });
 
 router.put('/hotel/add', (req, res) => {
+  const now = new Date();
+  const reservations = new Array(366);
+  reservations.fill({
+    year: now.getFullYear(),
+    guests: [],
+    numberOfGuests: 0,
+  });
+  req.body.rooms.forEach((room) => { room.reservations = reservations; });
+
   const hotel = new HotelModel({
     name: req.body.name,
     stars: req.body.stars,
@@ -72,59 +81,82 @@ router.post('/hotel/:hotelId/room/:roomId/:begin/:end/reserve', (req, res) => {
     return res.status(403).send({ message: 'You have to be logged in to make a reservation!' });
   }
 
-  HotelModel.findById(req.params.hotelId,
-    (findError, hotel) => {
-      if (findError) return res.status(500).send({ message: 'Error during finding the hotel' });
+  const beginDate = moment(req.params.begin, DATE_FORMAT);
+  const endDate = moment(req.params.end, DATE_FORMAT);
+  const today = moment();
 
-      const roomToReserve = hotel.rooms.find(room => room._id.equals(req.params.roomId));
-      if (!roomToReserve) return res.status(400).send({ message: 'There is no no such room' });
 
-      if (!date.isValid(req.params.begin, DATE_FORMAT)) {
-        return res.status(403).send({ message: 'Invalid date fromat for the beginning of the reservation. E.g.: 2018-01-05' });
-      }
+  if (!beginDate.isValid()) {
+    return res.status(400).send({ message: 'Invalid date fromat for the beginning of the reservation. YYYY-MM-DD' });
+  }
 
-      if (!date.isValid(req.params.end, DATE_FORMAT)) {
-        return res.status(403).send({ message: 'Invalid date fromat for the end of the reservation. E.g.: 2018-01-05' });
-      }
+  if (!beginDate.isValid()) {
+    return res.status(400).send({ message: 'Invalid date fromat for the end of the reservation. YYYY-MM-DD' });
+  }
 
-      let beginDate = date.parse(req.params.begin, DATE_FORMAT);
-      const endDate = date.parse(req.params.end, DATE_FORMAT);
+  if (beginDate.isBefore(today)) {
+    return res.status(400).send({ message: 'Cannot make reservation for a room starting in the past.' });
+  }
 
-      const datesForAllRoomsReserved = [];
-      while (beginDate < endDate) {
-        if (roomToReserve.reservations) {
-          const beginDateText = date.format(beginDate, DATE_FORMAT);
-          const guests = roomToReserve.reservations.get(beginDateText);
-          if (guests && roomToReserve.available === guests.length) {
-            datesForAllRoomsReserved.push(beginDateText);
-          }
-        }
-        beginDate = date.addDays(beginDate, 1);
-      }
-      if (datesForAllRoomsReserved.length > 0) {
-        return res.status(400).send({ message: `All rooms are reserved for dates: ${datesForAllRoomsReserved}` });
-      }
+  if (endDate.isBefore(today)) {
+    return res.status(400).send({ message: 'Cannot make reservation for a room ends in the past.' });
+  }
 
-      if (!roomToReserve.reservations) {
-        roomToReserve.reservations = new Map();
+  if (endDate.isBefore(beginDate)) {
+    return res.status(400).send({ message: 'The beginning of the reservation must be before the end!' });
+  }
+
+  if (!endDate.isAfter(today.clone().add(1, 'year'))) {
+    return res.status(400).send({ message: 'Cannot make reservation for more then a year from today!' });
+  }
+
+  HotelModel.findById(req.params.hotelId, { 'rooms._id': 1, 'rooms.available': 1 }, (err, hotel) => {
+    if (!hotel) {
+      return res.status(404).send({ message: 'No such hotel!' });
+    }
+    if (!hotel.rooms.id(req.params.roomId)) {
+      return res.status(404).send({ message: 'No such room!' });
+    }
+
+    const endDayOfYear = endDate.dayOfYear();
+
+    let date = beginDate.clone();
+    for (let i = beginDate.dayOfYear() - 1; i < endDayOfYear - 1; i += 1, date.add(1, 'days')) {
+      const clearOldResConditions = { rooms: { $elemMatch: { _id: req.params.roomId } } };
+      const clearOldResUpdate = { $set: {} };
+      const isOldReservation = {};
+      if (i < today.dayOfYear()) {
+        isOldReservation[`reservations.${i}.year`] = { $lte: today.year() };
+        clearOldResUpdate.$set[`rooms.$[room].reservations.${i}.year`] = today.year() + 1;
+      } else {
+        isOldReservation[`reservations.${i}.year`] = { $lt: today.year() };
+        clearOldResUpdate.$set[`rooms.$[room].reservations.${i}.numberOfGuests`] = today.year();
       }
-      beginDate = date.parse(req.params.begin, DATE_FORMAT);
-      while (beginDate < endDate) {
-        const beginDateText = date.format(beginDate, DATE_FORMAT);
-        if (!roomToReserve.reservations.has(beginDateText)) {
-          roomToReserve.reservations.set(beginDateText, []);
-        }
-        const guests = roomToReserve.reservations.get(beginDateText);
-        guests.push(req.session.passport.user._id);
-        beginDate = date.addDays(beginDate, 1);
-      }
-      roomToReserve.markModified('reservations');
-      hotel.save((saveError) => {
-        console.log(saveError);
-        if (saveError) return res.status(500).send({ message: 'Error during reserving room for new guest.' });
-        return res.status(200).send({ message: 'Reservation successful!' });
+      clearOldResConditions.rooms.$elemMatch = isOldReservation;
+      clearOldResUpdate.$set[`rooms.$[room].reservations.${i}.numberOfGuests`] = 0;
+      clearOldResUpdate.$set[`rooms.$[room].reservations.${i}.guests`] = [];
+      HotelModel.findOneAndUpdate(clearOldResConditions, clearOldResUpdate, { arrayFilters: [{ 'room._id': req.params.roomId }] },
+        (err) => {
+          if (err) return res.status(500).send({ message: err });
+        });
+    }
+
+    date = beginDate.clone();
+    const makeNewResConditions = { rooms: { $elemMatch: { _id: req.params.roomId } } };
+    const makeNewResUpdates = { $push: {}, $inc: {} };
+    for (let i = beginDate.dayOfYear() - 1; i < endDayOfYear - 1; i += 1, date.add(1, 'days')) {
+      const isThereAvailableRoom = {};
+      isThereAvailableRoom[`reservations.${i}.numberOfGuests`] = { $lt: hotel.rooms.id(req.params.roomId).available };
+      makeNewResConditions.rooms.$elemMatch = isThereAvailableRoom;
+      makeNewResUpdates.$inc[`rooms.$[room].reservations.${i}.numberOfGuests`] = 1;
+      makeNewResUpdates.$push[`rooms.$[room].reservations.${i}.guests`] = req.session.passport.user._id;
+    }
+    HotelModel.findOneAndUpdate(makeNewResConditions, makeNewResUpdates, { arrayFilters: [{ 'room._id': req.params.roomId }] },
+      (err, hotel) => {
+        if (err) return res.status(500).send({ message: err });
+        return res.status(200).send({ message: 'successful reservation!' });
       });
-    });
+  });
 });
 
 module.exports = router;

@@ -11,10 +11,11 @@ const hotelSchema = new mongoose.Schema({
     number_of_beds: { type: Number },
     extra_features: { type: [String] },
     available: { type: Number },
-    reservations: {
-      type: Map,
-      of: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
-    },
+    reservations: [{
+      year: Number,
+      guests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
+      numberOfGuests: Number,
+    }],
   }],
 }, { collection: 'hotels' });
 
