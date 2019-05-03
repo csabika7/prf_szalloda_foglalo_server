@@ -1,0 +1,39 @@
+{
+  "name": "prf_szalloda_foglalo_nodejs",
+  "version": "1.0.0",
+  "description": "**Title:** Szállodai foglalórendszer<br/> **Author:** Kocsis Csaba",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csabika7/prf_szalloda_foglalo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/csabika7/prf_szalloda_foglalo/issues"
+  },
+  "homepage": "https://github.com/csabika7/prf_szalloda_foglalo#readme",
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.1",
+    "nodemon": "^1.18.11"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
+    "date-and-time": "^0.6.3",
+    "express": "^4.16.4",
+    "express-session": "^1.16.1",
+    "moment": "^2.24.0",
+    "mongoose": "^5.5.1",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0"
+  }
+}
