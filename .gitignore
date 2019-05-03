@@ -1,1 +1,3 @@
-/node_modules/
+/service/node_modules/
+/ui/node_modules/
+.vscode
