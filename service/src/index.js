@@ -27,21 +27,21 @@ mongoose.connection.on('error', () => {
 });
 
 passport.serializeUser((user, done) => {
-  if (!user) return done('serializalasi hiba', user);
+  if (!user) return done({ message: 'serializalasi hiba', type: 'danger' }, user);
   return done(null, user);
 });
 
 passport.deserializeUser((user, done) => {
-  if (!user) return done('serializalasi hiba', user);
+  if (!user) return done({ message: 'serializalasi hiba', type: 'danger' }, user);
   return done(null, user);
 });
 
 passport.use('local',
   new LocalStrategy(((username, password, done) => {
     UserModel.findOne({ username }, (findError, user) => {
-      if (!user || findError) return done('cannot get user', false);
+      if (!user || findError) return done({ message: 'No such user!', type: 'danger' }, false);
       user.comparePasswords(password, (compareError, isMatch) => {
-        if (compareError || !isMatch) return done('password incorrect', false);
+        if (compareError || !isMatch) return done({ message: 'Incorrect password!', type: 'danger' }, false);
         return done(null, user);
       });
     });

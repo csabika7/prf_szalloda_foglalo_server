@@ -1,15 +1,19 @@
 version: 2
 services:
-  prf-hotel-nodejs:
-    build:
-      context: service/
-    ports:
-    - "4000:4000"
   prf-hotel-angular:
     build:
       context: ui/
     ports:
     - "4000:4000"
+    depends_on:
+    - prf-hotel-nodejs
+  prf-hotel-nodejs:
+    build:
+      context: service/
+    ports:
+    - "4000:4000"
+    depends_on:
+    - mongo
   mongo:
     image: mongo:4.0
     ports:

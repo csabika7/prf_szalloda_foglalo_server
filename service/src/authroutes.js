@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/user/register', (req, res) => {
   if (!req.body.username || !req.body.password) {
-    return res.status(404).send({ message: 'Username or password missing' });
+    return res.status(404).send({ message: 'Username or password missing', type: 'danger' });
   }
   const user = new UserModel({
     username: req.body.username,
@@ -16,7 +16,7 @@ router.post('/user/register', (req, res) => {
   });
   user.save((error) => {
     if (error) return res.status(500).send({ message: error });
-    return res.status(200).send({ message: 'Registration success' });
+    return res.status(200).send({ message: 'Registration success', type: 'success' });
   });
 });
 
@@ -27,9 +27,9 @@ router.get('/user/list', (req, res) => {
 router.post('/user/logout', (req, res) => {
   if (req.isAuthenticated()) {
     req.logout();
-    res.status(200).send({ message: 'You have been logged out' });
+    res.status(200).send({ message: 'You have been logged out', type: 'success' });
   } else {
-    res.status(403).send({ message: 'You have to log in first' });
+    res.status(403).send({ message: 'You have to log in first', type: 'danger' });
   }
 });
 
@@ -40,12 +40,12 @@ router.post('/user/login', (req, res) => {
         return res.status(403).send({ message: error });
       }
       req.logIn(username, (error) => {
-        if (error) return res.status(500).send({ message: error });
-        return res.status(200).send({ message: 'login successful' });
+        if (error) return res.status(500).send({ message: error, type: 'danger' });
+        return res.status(200).send({ message: 'login successful', type: 'success' });
       });
     })(req, res);
   } else {
-    return res.status(403).send({ messgage: 'username, password required' });
+    return res.status(403).send({ messgage: 'username, password required', type: 'danger' });
   }
 });
 

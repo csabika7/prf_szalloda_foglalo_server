@@ -1,0 +1,18 @@
+<div style="margin: auto; width: 20%; text-align: center;">
+  <table>
+    <tr>
+      <td>User name:</td>
+      <td><input type="text" id="username" placeholder="username" [(ngModel)]="username"></td>
+    </tr>
+    <tr>
+      <td>Password:</td>
+      <td><input type="password" id="password" placeholder="password" [(ngModel)]="password"></td>
+    </tr>
+    <tr>
+      <td colspan="2"><button class="btn btn-default" (click)="login()">Login</button></td>
+    </tr>
+    <tr>
+      <td colspan="2"><button class="btn btn-default" (click)="navigateToSignup()">Sign up</button></td>
+    </tr>
+  </table>
+</div>

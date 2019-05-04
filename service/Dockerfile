@@ -1,6 +1,8 @@
 FROM node:11.14.0-alpine
 
-COPY ./src /root
+RUN mkdir /root/src
+
+COPY ./src /root/src
 COPY package.json /root
 
 EXPOSE 3000
