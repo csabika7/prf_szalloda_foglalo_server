@@ -1,6 +1,5 @@
 
 const express = require('express');
-const passport = require('passport');
 const mongoose = require('mongoose');
 const moment = require('moment');
 
@@ -11,27 +10,24 @@ const DATE_FORMAT = 'YYYY-MM-DD';
 
 function validateDateInterval(beginDate, endDate, today, res) {
   if (!beginDate.isValid()) {
-    return res.status(400).send({ message: 'Invalid date fromat for the beginning of the reservation. YYYY-MM-DD' });
+    return res.status(400).send({ message: 'Invalid date fromat for the beginning of the reservation. YYYY-MM-DD', type: 'danger' });
   }
 
   if (!beginDate.isValid()) {
-    return res.status(400).send({ message: 'Invalid date fromat for the end of the reservation. YYYY-MM-DD' });
-  }
-
-  if (beginDate.isBefore(today)) {
-    return res.status(400).send({ message: 'Cannot make reservation for a room starting in the past.' });
-  }
-
-  if (endDate.isBefore(today)) {
-    return res.status(400).send({ message: 'Cannot make reservation for a room ends in the past.' });
+    return res.status(400).send({ message: 'Invalid date fromat for the end of the reservation. YYYY-MM-DD', type: 'danger' });
   }
 
   if (endDate.isBefore(beginDate)) {
-    return res.status(400).send({ message: 'The beginning of the reservation must be before the end!' });
+    return res.status(400).send({ message: 'The beginning of the reservation must be before the end!', type: 'danger' });
+  }
+  console.log(beginDate.toISOString());
+  console.log(today.toISOString());
+  if (beginDate.isBefore(today)) {
+    return res.status(400).send({ message: 'Cannot make reservation for a room in the past.', type: 'danger' });
   }
 
   if (endDate.isAfter(today.clone().add(1, 'year'))) {
-    return res.status(400).send({ message: 'Reservation date must be within one year!' });
+    return res.status(400).send({ message: 'Reservation date must be within one year!', type: 'danger' });
   }
   return null;
 }
@@ -55,11 +51,11 @@ router.get('/hotel/list', (req, res) => {
 router.get('/hotel/find', (req, res) => {
   const conditions = {};
   if (!req.query.arrival || !req.query.leaving) {
-    return res.status(403).send({ message: 'Arrival and leaving date must be given!' });
+    return res.status(403).send({ message: 'Arrival and leaving date must be given!', type: 'danger' });
   }
-  const today = moment();
-  const beginDate = moment(req.query.arrival, DATE_FORMAT);
-  const endDate = moment(req.query.leaving, DATE_FORMAT);
+  const today = moment.utc({ hour: 0, minute: 0, second: 0 });
+  const beginDate = moment.utc(req.query.arrival, DATE_FORMAT);
+  const endDate = moment.utc(req.query.leaving, DATE_FORMAT);
   const fauilre = validateDateInterval(beginDate, endDate, today, res);
   if (fauilre) {
     return fauilre;
@@ -115,10 +111,10 @@ router.get('/hotel/find', (req, res) => {
 });
 
 router.put('/hotel/add', (req, res) => {
-  const now = new Date();
+  const now = moment.utc({ hour: 0, minute: 0, second: 0 });
   const reservations = new Array(366);
   const reservationInit = {
-    year: now.getFullYear(),
+    year: now.year(),
     guests: [],
     numberOfGuests: 0,
   };
@@ -152,9 +148,9 @@ router.post('/hotel/:hotelId/room/:roomId/:begin/:end/reserve', (req, res) => {
     return res.status(403).send({ message: 'You have to be logged in to make a reservation!' });
   }
 
-  const beginDate = moment(req.params.begin, DATE_FORMAT);
-  const endDate = moment(req.params.end, DATE_FORMAT);
-  const today = moment();
+  const beginDate = moment.utc(req.params.begin, DATE_FORMAT);
+  const endDate = moment.utc(req.params.end, DATE_FORMAT);
+  const today = moment.utc({ hour: 0, minute: 0, second: 0 });
 
   const fauilre = validateDateInterval(beginDate, endDate, today, res);
   if (fauilre) {

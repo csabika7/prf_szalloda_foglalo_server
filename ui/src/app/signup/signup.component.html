@@ -2,21 +2,21 @@
     <table>
       <tr>
         <td>User name:</td>
-        <td><input type="text" id="username" placeholder="username" [(ngModel)]="username"></td>
+        <td><input type="text" id="username" class="form-control" placeholder="Enter user name" [(ngModel)]="username"></td>
       </tr>
       <tr>
           <td>Email:</td>
-          <td><input type="email" id="email" placeholder="email" [(ngModel)]="email"></td>
+          <td><input type="email" id="email" class="form-control" placeholder="Enter email" [(ngModel)]="email"></td>
         </tr>
       <tr>
         <td>Password:</td>
-        <td><input type="password" id="password" placeholder="password" [(ngModel)]="password"></td>
+        <td><input type="password" id="password" class="form-control" placeholder="Enter password" [(ngModel)]="password"></td>
       </tr>
       <tr>
-        <td colspan="2"><button class="btn btn-default" (click)="signup()">Sign up</button></td>
+        <td colspan="2"><button class="btn btn-primary" (click)="signup()">Sign up</button></td>
       </tr>
       <tr>
-        <td colspan="2"><button class="btn btn-default" (click)="navigateToLogin()">Login</button></td>
+        <td colspan="2"><button class="btn btn-primary" (click)="navigateToLogin()">Login</button></td>
       </tr>
     </table>
   </div>

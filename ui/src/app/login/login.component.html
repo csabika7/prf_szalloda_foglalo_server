@@ -2,17 +2,17 @@
   <table>
     <tr>
       <td>User name:</td>
-      <td><input type="text" id="username" placeholder="username" [(ngModel)]="username"></td>
+      <td><input type="text" class="form-control" id="username" placeholder="Enter user name" [(ngModel)]="username"></td>
     </tr>
     <tr>
       <td>Password:</td>
-      <td><input type="password" id="password" placeholder="password" [(ngModel)]="password"></td>
+      <td><input type="password" class="form-control" id="password" placeholder="Enter password" [(ngModel)]="password"></td>
     </tr>
     <tr>
-      <td colspan="2"><button class="btn btn-default" (click)="login()">Login</button></td>
+      <td colspan="2"><button class="btn btn-primary" (click)="login()">Login</button></td>
     </tr>
     <tr>
-      <td colspan="2"><button class="btn btn-default" (click)="navigateToSignup()">Sign up</button></td>
+      <td colspan="2"><button class="btn btn-primary" (click)="navigateToSignup()">Sign up</button></td>
     </tr>
   </table>
 </div>
