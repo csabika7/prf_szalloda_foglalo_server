@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { LoginService } from '../login.service';
+import { Alert } from '../reservation/reservation.component';
 
 @Component({
   selector: 'app-signup',
@@ -8,6 +9,7 @@ import { LoginService } from '../login.service';
 })
 export class SignupComponent implements OnInit {
   @Input() activeDialog: Map<String, Boolean>;
+  @Input() alerts: Array<Alert>
 
   username: string;
   password: string;
@@ -23,13 +25,10 @@ export class SignupComponent implements OnInit {
 
   signup() {
     this.loginService.signup(this.username, this.email, this.password).subscribe((data: any) => {
-      console.log('data');
-      console.log(data);
-      // localStorage.setItem("user", this.username);
-      // this.router.navigate(["/fruit"]);
-    }, (error) => {
-      console.log('error');
-      console.log(error);
+      this.alerts.push(data);
+      this.navigateToLogin();
+    }, (errResponse) => {
+      this.alerts.push(errResponse.error);
     })
   }
 

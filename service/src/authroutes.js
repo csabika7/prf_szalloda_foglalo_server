@@ -6,8 +6,8 @@ const UserModel = mongoose.model('user');
 const router = express.Router();
 
 router.post('/user/register', (req, res) => {
-  if (!req.body.username || !req.body.password) {
-    return res.status(404).send({ message: 'Username or password missing', type: 'danger' });
+  if (!req.body.username || !req.body.password || !req.body.email) {
+    return res.status(403).send({ message: 'User name, email, password required', type: 'danger' });
   }
   const user = new UserModel({
     username: req.body.username,
@@ -37,7 +37,7 @@ router.post('/user/login', (req, res) => {
   if (req.body.username && req.body.password) {
     passport.authenticate('local', (error, username) => {
       if (error) {
-        return res.status(403).send({ message: error });
+        return res.status(403).send({ message: error, type: 'danger' });
       }
       req.logIn(username, (error) => {
         if (error) return res.status(500).send({ message: error, type: 'danger' });
@@ -45,7 +45,7 @@ router.post('/user/login', (req, res) => {
       });
     })(req, res);
   } else {
-    return res.status(403).send({ messgage: 'username, password required', type: 'danger' });
+    return res.status(403).send({ message: 'Username, password required', type: 'danger' });
   }
 });
 

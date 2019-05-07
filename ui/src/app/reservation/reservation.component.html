@@ -1,3 +1,9 @@
+<div id="alertPlaceHolder" class="alert-container">
+  <p *ngFor="let alert of alerts">
+    <ngb-alert [type]="alert.type" (close)="close(alert)">{{ alert.message }}</ngb-alert>
+  </p>
+</div>
+
 <div id="searchTerms" style="margin: auto; width: 30%; text-align: center;">
   <ngb-datepicker #dp (select)="onDateSelection($event)" [minDate]="minDate" [maxDate]="maxDate" [displayMonths]="2" [dayTemplate]="t" outsideDays="hidden">
     </ngb-datepicker>
@@ -19,12 +25,13 @@
       <div class="card-body">
         <h3 class="card-title">{{hotel.name}}</h3>
         HOTEL FACILITIES:<br>
-        <span class="badge badge-secondary" style="margin-right: .25em;" *ngFor="let feature of hotel.extra_features">{{feature}}</span><br>
-        Ratings: <ngb-rating [(rate)]="hotel.stars" [readonly]="true" [max]="5"></ngb-rating><br>
+        <span class="badge badge-dark" style="margin-right: .25em;" *ngFor="let feature of hotel.extra_features">{{feature}}</span><br>
+        Stars: <ngb-rating [(rate)]="hotel.stars" [readonly]="true" [max]="5"></ngb-rating><br>
+        User ratings: <ngb-rating [(rate)]="hotel.stars" [readonly]="true" [max]="5"></ngb-rating><br>
         Available rooms:
         <hr>
         <div id="{{room._id}}" *ngFor="let room of hotel.rooms">
-          <button class="btn btn-primary" style="float: right" (click)="reserve(hotel._id, room._id)" *ngIf="room.remaining > 0">Reserve</button>
+          <button class="btn btn-primary" style="float: right" (click)="reserve(hotel._id, room._id, content)" *ngIf="room.remaining > 0">Reserve</button>
           Number of beds: {{room.number_of_beds}}<br>
           ROOM FACILITIES:<br>
           <span class="badge badge-secondary" style="margin-right: .25em;" *ngFor="let feature of room.extra_features">{{feature}}</span><br>
@@ -46,8 +53,8 @@
           </button>
       </div>
       <div class="modal-body">
-        <app-login [activeDialog]="activeDialog" *ngIf="activeDialog.get('login')"></app-login>
-        <app-signup [activeDialog]="activeDialog" *ngIf="activeDialog.get('signup')"></app-signup>
+        <app-login [activeDialog]="activeDialog" [alerts]="alerts" [dialog]="openedDialog" *ngIf="activeDialog.get('login')"></app-login>
+        <app-signup [activeDialog]="activeDialog" [alerts]="alerts" *ngIf="activeDialog.get('signup')"></app-signup>
       </div>
     </ng-template> 
 </div>

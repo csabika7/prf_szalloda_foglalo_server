@@ -1,5 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { LoginService } from '../login.service';
+import { Alert } from '../reservation/reservation.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-login',
@@ -8,6 +10,8 @@ import { LoginService } from '../login.service';
 })
 export class LoginComponent implements OnInit {
   @Input() activeDialog: Map<String, Boolean>;
+  @Input() alerts: Array<Alert>;
+  @Input() dialog: NgbModalRef;
 
   username: string;
   password: string;
@@ -23,14 +27,12 @@ export class LoginComponent implements OnInit {
 
   login() {
     this.loginService.login(this.username, this.password).subscribe((data: any) => {
-      console.log('data');
-      console.log(data);
-      // localStorage.setItem("user", this.username);
-      // this.router.navigate(["/fruit"]);
-    }, (error) => {
-      console.log('error');
-      console.log(error);
-    })
+      this.alerts.push(data);
+      localStorage.setItem("user", this.username);
+      this.dialog.dismiss("logged in");
+    }, (errResponse) => {
+      this.alerts.push(errResponse.error);
+    });
   }
 
   navigateToSignup() {

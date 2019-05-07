@@ -4,6 +4,10 @@ import { ReservationService } from '../reservation.service';
 import * as moment from 'moment';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 
+export interface Alert {
+  type: string;
+  message: string;
+}
 
 interface Room {
   _id: string,
@@ -26,6 +30,8 @@ interface Hotel {
   styleUrls: ['./reservation.component.css']
 })
 export class ReservationComponent implements OnInit {
+
+  alerts: Array<Alert>; 
 
   activeDialog: Map<String, Boolean>;
   dialogCloseResult: string;
@@ -55,6 +61,7 @@ export class ReservationComponent implements OnInit {
     this.activeDialog = new Map();
     this.activeDialog.set("login", true);
     this.activeDialog.set("signup", false);
+    this.alerts = [];
   }
 
   onDateSelection(date: NgbDate) {
@@ -83,16 +90,20 @@ export class ReservationComponent implements OnInit {
   findHotels() {
     this.reservationService.findHotels(this.arrivalDate(), this.leavingDate()).subscribe((data: any) => {
       this.hotels = data;
-    }, (error) => {
-      console.log('error');
-      console.log(error);
-    })
+    }, (errResponse) => {
+      this.alerts.push(errResponse.error);
+    });
   }
 
-  reserve(hotelId: string, roomId: string) {
+  reserve(hotelId: string, roomId: string, dialogContent: string) {
+    if(!localStorage.getItem("user")) {
+      return this.openDialog(dialogContent);
+    }
     this.reservationService.reserve(hotelId, roomId, this.arrivalDate(), this.leavingDate()).subscribe((data: any) => {
       console.log(data);
-    })
+    }, (errResponse) => {
+      this.alerts.push(errResponse.error);
+    });
   }
 
   arrivalDate() {
@@ -103,7 +114,7 @@ export class ReservationComponent implements OnInit {
     return moment.utc({year: this.toDate.year, month: this.toDate.month - 1, day: this.toDate.day})
   }
 
-  openDialog(content) {
+  openDialog(content: string) {
     this.openedDialog = this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
     this.openedDialog.result.then((result) => {
       this.dialogCloseResult = `Closed with: ${result}`;
@@ -124,5 +135,9 @@ export class ReservationComponent implements OnInit {
     } else {
       return  `with: ${reason}`;
     }
+  }
+
+  close(alert: Alert) {
+    this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
 }

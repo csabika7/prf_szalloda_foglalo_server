@@ -4,14 +4,14 @@ services:
     build:
       context: ui/
     ports:
-    - "4000:4000"
+    - "4200:4200"
     depends_on:
     - prf-hotel-nodejs
   prf-hotel-nodejs:
     build:
       context: service/
     ports:
-    - "4000:4000"
+    - "3000:3000"
     depends_on:
     - mongo
   mongo:

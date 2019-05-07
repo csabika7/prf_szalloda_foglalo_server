@@ -37,6 +37,7 @@ router.get('/hotel/list', (req, res) => {
     stars: 1,
     name: 1,
     extra_features: 1,
+    'rooms._id': 1,
     'rooms.number_of_beds': 1,
     'rooms.extra_features': 1,
   }, (error, hotels) => {
@@ -71,8 +72,8 @@ router.get('/hotel/find', (req, res) => {
     if (req.query.number_of_beds) {
       roomConditions.number_of_beds = { $eq: req.query.number_of_beds };
     }
-    if (req.query.extra_features && req.query.extra_features.length > 0) {
-      roomConditions.extra_features = { $all: req.query.extra_features };
+    if (req.query.romm_extra_features && req.query.romm_extra_features.length > 0) {
+      roomConditions.romm_extra_features = { $all: req.query.romm_extra_features };
     }
     conditions.rooms.$elemMatch = roomConditions;
   }
@@ -129,22 +130,22 @@ router.put('/hotel/add', (req, res) => {
     rooms: req.body.rooms,
   });
   hotel.save((error) => {
-    if (error) return res.status(500).send({ message: 'Error while adding new hotel to the database!' });
-    return res.status(200).send({ message: 'Hotel added!' });
+    if (error) return res.status(500).send({ message: 'Error while adding new hotel to the database!', type: 'danger' });
+    return res.status(200).send({ message: 'Hotel added!', type: 'success' });
   });
 });
 
 router.post('/hotel/:id/room/add', (req, res) => {
   HotelModel.findOneAndUpdate({ _id: req.params.id }, { $push: { rooms: req.body } },
     (error) => {
-      if (error) return res.status(500).send({ message: 'Error while adding room to the hotel!' });
-      return res.status(200).send({ message: 'Room added!' });
+      if (error) return res.status(500).send({ message: 'Error while adding room to the hotel!', type: 'danger' });
+      return res.status(200).send({ message: 'Room added!', type: 'success' });
     });
 });
 
 router.post('/hotel/:hotelId/room/:roomId/:begin/:end/reserve', (req, res) => {
   if (!req.isAuthenticated()) {
-    return res.status(403).send({ message: 'You have to be logged in to make a reservation!' });
+    return res.status(403).send({ message: 'You have to be logged in to make a reservation!', type: 'danger' });
   }
 
   const beginDate = moment.utc(req.params.begin, DATE_FORMAT);
@@ -158,10 +159,10 @@ router.post('/hotel/:hotelId/room/:roomId/:begin/:end/reserve', (req, res) => {
 
   HotelModel.findById(req.params.hotelId, { 'rooms._id': 1, 'rooms.available': 1 }, (err, hotel) => {
     if (!hotel) {
-      return res.status(404).send({ message: 'No such hotel!' });
+      return res.status(404).send({ message: 'No such hotel!', type: 'danger' });
     }
     if (!hotel.rooms.id(req.params.roomId)) {
-      return res.status(404).send({ message: 'No such room!' });
+      return res.status(404).send({ message: 'No such room!', type: 'danger' });
     }
 
     let date = beginDate.clone();
@@ -181,7 +182,7 @@ router.post('/hotel/:hotelId/room/:roomId/:begin/:end/reserve', (req, res) => {
       clearOldResUpdate.$set[`rooms.$[room].reservations.${i}.guests`] = [];
       HotelModel.findOneAndUpdate(clearOldResConditions, clearOldResUpdate, { arrayFilters: [{ 'room._id': req.params.roomId }] },
         (err) => {
-          if (err) return res.status(500).send({ message: err });
+          if (err) return res.status(500).send({ message: err, type: 'danger' });
         });
     }
 
@@ -197,8 +198,8 @@ router.post('/hotel/:hotelId/room/:roomId/:begin/:end/reserve', (req, res) => {
     }
     HotelModel.findOneAndUpdate(makeNewResConditions, makeNewResUpdates, { arrayFilters: [{ 'room._id': req.params.roomId }] },
       (err, hotel) => {
-        if (err) return res.status(500).send({ message: err });
-        return res.status(200).send({ message: 'successful reservation!' });
+        if (err) return res.status(500).send({ message: err, type: 'danger' });
+        return res.status(200).send({ message: 'successful reservation!', type: 'success' });
       });
   });
 });
