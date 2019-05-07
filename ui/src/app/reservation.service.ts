@@ -8,17 +8,31 @@ import * as moment from 'moment';
 })
 export class ReservationService {
 
-  constructor(private httpClient: HttpClient) { }
+  DATE_FORMAT: string;
+
+  constructor(private httpClient: HttpClient) { 
+    this.DATE_FORMAT = "YYYY-MM-DD"
+  }
 
   findHotels(from: moment.Moment, to: moment.Moment) {
-    let DATE_FORMAT = "YYYY-MM-DD";
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json'
       })
     };
-    const fromDateParam = from.format(DATE_FORMAT);
-    const toDateParam = to.format(DATE_FORMAT);
+    const fromDateParam = from.format(this.DATE_FORMAT);
+    const toDateParam = to.format(this.DATE_FORMAT);
     return this.httpClient.get(`http://localhost:3000/hotel/find?arrival=${fromDateParam}&leaving=${toDateParam}`, httpOptions);
+  }
+
+  reserve(hotelId: string, roomId: string, from: moment.Moment, to: moment.Moment) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json'
+      })
+    };
+    const fromDateParam = from.format(this.DATE_FORMAT);
+    const toDateParam = to.format(this.DATE_FORMAT);
+    return this.httpClient.post(`http://localhost:3000/hotel/${hotelId}/room/${roomId}/${fromDateParam}/${toDateParam}/reserve`, httpOptions);
   }
 }

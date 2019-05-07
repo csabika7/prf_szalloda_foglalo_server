@@ -1,16 +1,16 @@
-<div style="margin: auto; width: 20%; text-align: center;">
-    <table>
+<div>
+    <table style="width: 100%;">
       <tr>
         <td>User name:</td>
-        <td><input type="text" id="username" class="form-control" placeholder="Enter user name" [(ngModel)]="username"></td>
+        <td><input type="text" id="regUserName" class="form-control" placeholder="Enter user name" [(ngModel)]="username"></td>
       </tr>
       <tr>
           <td>Email:</td>
-          <td><input type="email" id="email" class="form-control" placeholder="Enter email" [(ngModel)]="email"></td>
+          <td><input type="email" id="regEmail" class="form-control" placeholder="Enter email" [(ngModel)]="email"></td>
         </tr>
       <tr>
         <td>Password:</td>
-        <td><input type="password" id="password" class="form-control" placeholder="Enter password" [(ngModel)]="password"></td>
+        <td><input type="password" id="regPassword" class="form-control" placeholder="Enter password" [(ngModel)]="password"></td>
       </tr>
       <tr>
         <td colspan="2"><button class="btn btn-primary" (click)="signup()">Sign up</button></td>

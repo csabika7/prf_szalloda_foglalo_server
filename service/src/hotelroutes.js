@@ -20,8 +20,7 @@ function validateDateInterval(beginDate, endDate, today, res) {
   if (endDate.isBefore(beginDate)) {
     return res.status(400).send({ message: 'The beginning of the reservation must be before the end!', type: 'danger' });
   }
-  console.log(beginDate.toISOString());
-  console.log(today.toISOString());
+
   if (beginDate.isBefore(today)) {
     return res.status(400).send({ message: 'Cannot make reservation for a room in the past.', type: 'danger' });
   }

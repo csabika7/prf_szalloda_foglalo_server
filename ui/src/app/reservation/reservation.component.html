@@ -24,13 +24,30 @@
         Available rooms:
         <hr>
         <div id="{{room._id}}" *ngFor="let room of hotel.rooms">
-          <button class="btn btn-primary" style="float: right" (click)="reserve()" *ngIf="room.remaining > 0">Reserve</button>
+          <button class="btn btn-primary" style="float: right" (click)="reserve(hotel._id, room._id)" *ngIf="room.remaining > 0">Reserve</button>
           Number of beds: {{room.number_of_beds}}<br>
           ROOM FACILITIES:<br>
           <span class="badge badge-secondary" style="margin-right: .25em;" *ngFor="let feature of room.extra_features">{{feature}}</span><br>
-          Still available: <span class="badge badge-dark">{{room.remaining}}</span><br>
+          Still available:
+          <span class="badge badge-success" *ngIf="room.remaining > 0">{{room.remaining}}</span>
+          <span class="badge badge-danger" *ngIf="room.remaining === 0">{{room.remaining}}</span><br>
           <hr>
         </div>
       </div>
   </div>
+</div>
+<div>
+  <ng-template #content let-model>
+      <div class="modal-header">
+          <h4 class="modal-title" id="modal-basic-title" *ngIf="activeDialog.get('login')">Login</h4>
+          <h4 class="modal-title" id="modal-basic-title" *ngIf="activeDialog.get('signup')">Sign up</h4>
+          <button type="button" class="close" aria-label="Close" (click)="closeDialog('Cross click')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body">
+        <app-login [activeDialog]="activeDialog" *ngIf="activeDialog.get('login')"></app-login>
+        <app-signup [activeDialog]="activeDialog" *ngIf="activeDialog.get('signup')"></app-signup>
+      </div>
+    </ng-template> 
 </div>

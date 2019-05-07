@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, Input } from '@angular/core';
 import { LoginService } from '../login.service';
 
 @Component({
@@ -8,14 +7,13 @@ import { LoginService } from '../login.service';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent implements OnInit {
+  @Input() activeDialog: Map<String, Boolean>;
 
   username: string;
   password: string;
   email: string;
 
-  constructor(private route: ActivatedRoute,
-    private router: Router,
-    private loginService: LoginService) { }
+  constructor(private loginService: LoginService) { }
 
   ngOnInit() {
     this.username = '';
@@ -36,6 +34,7 @@ export class SignupComponent implements OnInit {
   }
 
   navigateToLogin() {
-    this.router.navigate(["/login"]);
+    this.activeDialog.set("signup", false);
+    this.activeDialog.set("login", true);
   }
 }

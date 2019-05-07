@@ -1,17 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { NgbDate, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDate, NgbCalendar, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ReservationService } from '../reservation.service';
 import * as moment from 'moment';
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+
 
 interface Room {
-  _id: Number,
+  _id: string,
   number_of_beds: Number,
   extra_features: Array<string>,
   remaining: Number
 }
 
 interface Hotel {
-  _id: Number,
+  _id: string,
   stars: Number,
   name: string,
   extra_features: Array<string>,
@@ -25,6 +27,10 @@ interface Hotel {
 })
 export class ReservationComponent implements OnInit {
 
+  activeDialog: Map<String, Boolean>;
+  dialogCloseResult: string;
+  openedDialog: NgbModalRef;
+
   hoveredDate: NgbDate;
 
   fromDate: NgbDate;
@@ -35,7 +41,8 @@ export class ReservationComponent implements OnInit {
 
   hotels: Array<Hotel>;
 
-  constructor(private calendar: NgbCalendar, private reservationService: ReservationService) { }
+  constructor(private calendar: NgbCalendar, private reservationService: ReservationService,
+    private modalService: NgbModal) { }
 
   ngOnInit() {
     this.fromDate = this.calendar.getToday();
@@ -45,6 +52,9 @@ export class ReservationComponent implements OnInit {
     const nextYear = today.add(1, 'year');
     this.maxDate = new NgbDate(nextYear.year(), nextYear.month() + 1, nextYear.date() - 1)
     this.hotels = [];
+    this.activeDialog = new Map();
+    this.activeDialog.set("login", true);
+    this.activeDialog.set("signup", false);
   }
 
   onDateSelection(date: NgbDate) {
@@ -71,9 +81,7 @@ export class ReservationComponent implements OnInit {
   }
 
   findHotels() {
-    const from = moment.utc({year: this.fromDate.year, month: this.fromDate.month - 1, day: this.fromDate.day})
-    const to = moment.utc({year: this.toDate.year, month: this.toDate.month - 1, day: this.toDate.day})
-    this.reservationService.findHotels(from, to).subscribe((data: any) => {
+    this.reservationService.findHotels(this.arrivalDate(), this.leavingDate()).subscribe((data: any) => {
       this.hotels = data;
     }, (error) => {
       console.log('error');
@@ -81,7 +89,40 @@ export class ReservationComponent implements OnInit {
     })
   }
 
-  reserve() {
-    console.log("reserving");
+  reserve(hotelId: string, roomId: string) {
+    this.reservationService.reserve(hotelId, roomId, this.arrivalDate(), this.leavingDate()).subscribe((data: any) => {
+      console.log(data);
+    })
+  }
+
+  arrivalDate() {
+    return moment.utc({year: this.fromDate.year, month: this.fromDate.month - 1, day: this.fromDate.day})
+  }
+
+  leavingDate() {
+    return moment.utc({year: this.toDate.year, month: this.toDate.month - 1, day: this.toDate.day})
+  }
+
+  openDialog(content) {
+    this.openedDialog = this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
+    this.openedDialog.result.then((result) => {
+      this.dialogCloseResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.dialogCloseResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  closeDialog(reason) {
+    this.openedDialog.close(reason);
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return  `with: ${reason}`;
+    }
   }
 }
