@@ -1,23 +1,39 @@
 <div>
-    <table style="width: 100%;">
-      <tr>
-        <td>User name:</td>
-        <td><input type="text" id="regUserName" class="form-control" placeholder="Enter user name" [(ngModel)]="username"></td>
+  <table style="width: 100%;">
+    <tr>
+      <td>User name:</td>
+      <td><input type="text" id="regUserName" class="form-control"  placeholder="Enter user name" formControlName="name" [(formControl)]="username"></td>
+    </tr>
+    <tr>
+        <td>Email:</td>
+        <td><input type="email" id="regEmail" class="form-control" placeholder="Enter email" formControlName="name" [(formControl)]="email"></td>
       </tr>
-      <tr>
-          <td>Email:</td>
-          <td><input type="email" id="regEmail" class="form-control" placeholder="Enter email" [(ngModel)]="email"></td>
-        </tr>
-      <tr>
-        <td>Password:</td>
-        <td><input type="password" id="regPassword" class="form-control" placeholder="Enter password" [(ngModel)]="password"></td>
-      </tr>
-      <tr>
-        <td colspan="2"><button class="btn btn-primary" (click)="signup()">Sign up</button></td>
-      </tr>
-      <tr>
-        <td colspan="2"><button class="btn btn-primary" (click)="navigateToLogin()">Login</button></td>
-      </tr>
-    </table>
-  </div>
+    <tr>
+    <tr>
+      <td>Password:</td>
+      <td><input type="password" id="regPassword" class="form-control" placeholder="Enter password" formControlName="name" [(formControl)]="password"></td>
+    </tr>
+    <tr>
+      <td colspan="2"><button class="btn btn-primary" (click)="signup()">Sign up</button></td>
+    </tr>
+    <tr>
+      <td colspan="2"><button class="btn btn-primary" (click)="navigateToLogin()">Login</button></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <div *ngIf="username.invalid && (username.dirty || username.touched)" class="alert alert-danger">
+            <span *ngIf="username.errors.required">User name is required.</span>
+        </div>
+        <div *ngIf="password.invalid && (password.dirty || password.touched)" class="alert alert-danger">
+          <span *ngIf="password.errors.required">Password is required.</span>
+          <span *ngIf="password.errors.minLength">Password must be at least 4 characters long.</span>
+        </div>
+        <div *ngIf="email.invalid && (email.dirty || email.touched)" class="alert alert-danger">
+          <span *ngIf="email.errors.required">Email is required.</span>
+          <span *ngIf="email.errors.email">Enter valid email.</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
   

@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { LoginService } from '../login.service';
 import { Alert } from '../reservation/reservation.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -13,22 +14,24 @@ export class LoginComponent implements OnInit {
   @Input() alerts: Array<Alert>;
   @Input() dialog: NgbModalRef;
 
-  username: string;
-  password: string;
-  message: string;
+  username: FormControl;
+  password: FormControl;
 
   constructor(private loginService: LoginService) { }
 
   ngOnInit() {
-    this.username = '';
-    this.password = '';
-    this.message = '';
+    this.username = new FormControl('', [
+      Validators.required
+    ]);
+    this.password = new FormControl('', [
+      Validators.required
+    ]);
   }
 
   login() {
-    this.loginService.login(this.username, this.password).subscribe((data: any) => {
+    this.loginService.login(this.username.value, this.password.value).subscribe((data: any) => {
       this.alerts.push(data);
-      localStorage.setItem("user", this.username);
+      localStorage.setItem("user", this.username.value);
       this.dialog.dismiss("logged in");
     }, (errResponse) => {
       this.alerts.push(errResponse.error);

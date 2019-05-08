@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbDate, NgbCalendar, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ReservationService } from '../reservation.service';
 import * as moment from 'moment';
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 export interface Alert {
   type: string;
@@ -118,23 +118,11 @@ export class ReservationComponent implements OnInit {
     this.openedDialog = this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
     this.openedDialog.result.then((result) => {
       this.dialogCloseResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.dialogCloseResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
   }
 
   closeDialog(reason) {
     this.openedDialog.close(reason);
-  }
-
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return  `with: ${reason}`;
-    }
   }
 
   close(alert: Alert) {

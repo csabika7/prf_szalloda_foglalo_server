@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { LoginService } from '../login.service';
 import { Alert } from '../reservation/reservation.component';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-signup',
@@ -11,20 +12,28 @@ export class SignupComponent implements OnInit {
   @Input() activeDialog: Map<String, Boolean>;
   @Input() alerts: Array<Alert>
 
-  username: string;
-  password: string;
-  email: string;
+  username: FormControl;
+  password: FormControl;
+  email: FormControl;
 
   constructor(private loginService: LoginService) { }
 
   ngOnInit() {
-    this.username = '';
-    this.password = '';
-    this.email = '';
+    this.username = new FormControl('', [
+      Validators.required
+    ]);
+    this.password = new FormControl('',[
+      Validators.required,
+      //Validators.minLength(8)
+    ]);
+    this.email = new FormControl('',[
+      Validators.required,
+      Validators.email
+    ]);
   }
 
   signup() {
-    this.loginService.signup(this.username, this.email, this.password).subscribe((data: any) => {
+    this.loginService.signup(this.username.value, this.email.value, this.password.value).subscribe((data: any) => {
       this.alerts.push(data);
       this.navigateToLogin();
     }, (errResponse) => {
