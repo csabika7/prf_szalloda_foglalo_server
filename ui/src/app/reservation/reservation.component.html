@@ -27,7 +27,7 @@
         HOTEL FACILITIES:<br>
         <span class="badge badge-dark" style="margin-right: .25em;" *ngFor="let feature of hotel.extra_features">{{feature}}</span><br>
         Stars: <ngb-rating [(rate)]="hotel.stars" [readonly]="true" [max]="5"></ngb-rating><br>
-        User ratings: <ngb-rating [(rate)]="hotel.stars" [readonly]="true" [max]="5"></ngb-rating><br>
+        User ratings: <ngb-rating [(rate)]="hotel.userRatings" (rateChange)="rate(hotel, content)" [max]="5"></ngb-rating><br>
         Available rooms:
         <hr>
         <div id="{{room._id}}" *ngFor="let room of hotel.rooms">

@@ -32,7 +32,8 @@ export class LoginComponent implements OnInit {
     this.loginService.login(this.username.value, this.password.value).subscribe((data: any) => {
       this.alerts.push(data);
       localStorage.setItem("user", this.username.value);
-      this.dialog.dismiss("logged in");
+      this.dialog.dismiss();
+      console.log(data);
     }, (errResponse) => {
       this.alerts.push(errResponse.error);
     });

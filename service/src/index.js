@@ -1,5 +1,5 @@
 // parameters
-const dbUrl = 'mongodb://localhost:27017';
+const dbUrl = 'mongodb://prf-hotel-mongo:27017';
 
 // imports
 const express = require('express');
@@ -12,6 +12,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const cors = require('cors');
 require('./usermodel');
 require('./hotelmodel');
+require('./ratingsmodel');
 
 const UserModel = mongoose.model('user');
 
@@ -51,9 +52,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.use(cors());
+// app.use(cors({
+//   credentials: true,
+//   origin: true,
+// }));
 
-app.use(expressSession({ secret: '12354456462almajjimnhgiknb,' }));
+app.use(expressSession({
+  secret: '12354456462almajjimnhgiknb,',
+  cookie: { httpOnly: false, secure: false },
+  saveUninitialized: true,
+  resave: true,
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 

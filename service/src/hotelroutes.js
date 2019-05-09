@@ -4,9 +4,29 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 
 const HotelModel = mongoose.model('hotel');
+const RatingsModel = mongoose.model('rating');
 const router = express.Router();
 
 const DATE_FORMAT = 'YYYY-MM-DD';
+
+function computeUserRatings(hotelId) {
+  return RatingsModel.aggregate([
+    {
+      $match: {
+        hotelId: new mongoose.Types.ObjectId(hotelId),
+      },
+    }, {
+      $group: {
+        _id: null,
+        ratings: { $avg: '$rating' },
+      },
+    }, {
+      $project: {
+        _id: 0,
+        ratings: 1,
+      },
+    }]);
+}
 
 function validateDateInterval(beginDate, endDate, today, res) {
   if (!beginDate.isValid()) {
@@ -35,6 +55,7 @@ router.get('/hotel/list', (req, res) => {
   HotelModel.find({}, {
     _id: 1,
     stars: 1,
+    userRatings: 1,
     name: 1,
     extra_features: 1,
     'rooms._id': 1,
@@ -82,6 +103,7 @@ router.get('/hotel/find', (req, res) => {
   HotelModel.find(conditions, {
     _id: 1,
     stars: 1,
+    userRatings: 1,
     name: 1,
     extra_features: 1,
     'rooms._id': 1,
@@ -140,6 +162,36 @@ router.post('/hotel/:id/room/add', (req, res) => {
     (error) => {
       if (error) return res.status(500).send({ message: 'Error while adding room to the hotel!', type: 'danger' });
       return res.status(200).send({ message: 'Room added!', type: 'success' });
+    });
+});
+
+router.get('/hotel/:hotelId/ratings', (req, res) => {
+  computeUserRatings(req.params.hotelId).then((agg) => {
+    if (agg.length === 0) {
+      return res.status(404).send({ message: 'Hotel was not found.', type: 'danger' });
+    }
+    return res.status(200).send(agg[0]);
+  }, error => res.status(500).send({ message: error, type: 'danger' }));
+});
+
+router.post('/hotel/:hotelId/rate/:rating', (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(403).send({ message: 'You have to be logged in to rate hotels!', type: 'danger' });
+  }
+  console.log('rating');
+  RatingsModel.update({ hotelId: req.params.hotelId, userId: req.session.passport.user._id },
+    { rating: req.params.rating }, { upsert: true }, (ratingsUpdateError) => {
+      if (ratingsUpdateError) return res.status(500).send({ message: ratingsUpdateError, type: 'danger' });
+      computeUserRatings(req.params.hotelId).then((agg) => {
+        if (agg.length === 1) {
+          console.log(agg);
+          HotelModel.update({ _id: req.params.hotelId }, { userRatings: agg[0].ratings },
+            (hotelUpdateError, doc) => {
+              if (hotelUpdateError) console.log(`error updating ratings in hotel ${req.params.hotelId}: ${hotelUpdateError}`);
+            });
+        }
+      }, computeError => console.log(`error computing ratings for hotel ${req.params.hotelId}: ${computeError}`));
+      return res.status(200).send({ message: 'Thank you for your feedback!', type: 'success' });
     });
 });
 

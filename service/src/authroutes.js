@@ -20,10 +20,6 @@ router.post('/user/register', (req, res) => {
   });
 });
 
-router.get('/user/list', (req, res) => {
-  UserModel.find({}, (err, users) => res.send(users));
-});
-
 router.post('/user/logout', (req, res) => {
   if (req.isAuthenticated()) {
     req.logout();
@@ -39,7 +35,7 @@ router.post('/user/login', (req, res) => {
       if (error) {
         return res.status(403).send({ message: error, type: 'danger' });
       }
-      req.logIn(username, (error) => {
+      req.login(username, (error) => {
         if (error) return res.status(500).send({ message: error, type: 'danger' });
         return res.status(200).send({ message: 'login successful', type: 'success' });
       });

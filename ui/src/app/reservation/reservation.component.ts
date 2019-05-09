@@ -19,6 +19,7 @@ interface Room {
 interface Hotel {
   _id: string,
   stars: Number,
+  userRatings: Number,
   name: string,
   extra_features: Array<string>,
   rooms: Array<Room>
@@ -97,10 +98,11 @@ export class ReservationComponent implements OnInit {
 
   reserve(hotelId: string, roomId: string, dialogContent: string) {
     if(!localStorage.getItem("user")) {
+      this.alerts.push({ message: 'You have to be logged in reserve a room!', type: 'danger' })
       return this.openDialog(dialogContent);
     }
-    this.reservationService.reserve(hotelId, roomId, this.arrivalDate(), this.leavingDate()).subscribe((data: any) => {
-      console.log(data);
+    this.reservationService.reserve(hotelId, roomId, this.arrivalDate(), this.leavingDate()).subscribe((message: Alert) => {
+      this.alerts.push(message);
     }, (errResponse) => {
       this.alerts.push(errResponse.error);
     });
@@ -127,5 +129,17 @@ export class ReservationComponent implements OnInit {
 
   close(alert: Alert) {
     this.alerts.splice(this.alerts.indexOf(alert), 1);
+  }
+
+  rate(hotel: Hotel, dialogContent: string) {
+    if(!localStorage.getItem("user")) {
+      this.alerts.push({ message: 'You have to be logged in reserve a room!', type: 'danger' })
+      return this.openDialog(dialogContent);
+    }
+    this.reservationService.rate(hotel._id, hotel.userRatings).subscribe((message: Alert) => {
+      this.alerts.push(message);
+    }, (errResponse) => {
+      this.alerts.push(errResponse.error);
+    });
   }
 }

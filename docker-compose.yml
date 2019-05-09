@@ -1,5 +1,16 @@
-version: 2
+version: "2"
 services:
+  prf-hotel-mongo:
+    image: mongo:4.0
+    ports:
+    - "27017:27017"
+  prf-hotel-nodejs:
+    build:
+      context: service/
+    ports:
+    - "3000:3000"
+    depends_on:
+    - prf-hotel-mongo
   prf-hotel-angular:
     build:
       context: ui/
@@ -7,14 +18,11 @@ services:
     - "4200:4200"
     depends_on:
     - prf-hotel-nodejs
-  prf-hotel-nodejs:
-    build:
-      context: service/
+  prf-hotel-nginx:
+    image: nginx:1.16.0
+    volumes:
+    - "./nginx/nginx.conf:/etc/nginx/nginx.conf"
     ports:
-    - "3000:3000"
+    - "8080:80"
     depends_on:
-    - mongo
-  mongo:
-    image: mongo:4.0
-    ports:
-    - "27017:27017"
+    - prf-hotel-angular
