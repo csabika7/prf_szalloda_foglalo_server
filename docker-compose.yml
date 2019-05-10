@@ -9,6 +9,9 @@ services:
       context: service/
     ports:
     - "3000:3000"
+    environment:
+    - "EMAIL_USER="
+    - "EMAIL_PASS="
     depends_on:
     - prf-hotel-mongo
   prf-hotel-angular:

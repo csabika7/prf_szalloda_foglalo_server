@@ -2,12 +2,48 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const moment = require('moment');
+const mailer = require('nodemailer');
 
 const HotelModel = mongoose.model('hotel');
 const RatingsModel = mongoose.model('rating');
 const router = express.Router();
 
 const DATE_FORMAT = 'YYYY-MM-DD';
+
+function sendEmail(userName, userEmail, numberOfBeds, arrival, leaving, hotel, cb) {
+  const transporter = mailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+  transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: userEmail,
+    subject: `Your reservation to ${hotel}`,
+    text: `Hello ${userName}!
+    Thank you for your reservation!.
+    Reservation details:
+    Hotel: ${hotel}
+    Room: ${numberOfBeds} beds in the bedroom
+    Arrival: ${arrival}
+    Leaving: ${leaving}
+
+    See you soon!
+    `,
+    html: `<h2>Thank you for your reservation!.</h2>
+    <p>Reservation details:</p>
+    <ul>
+    <li> Hotel: ${hotel}</li>
+    <li>Room: ${numberOfBeds} beds in the bedroom,</li>
+    <li>Arrival: ${arrival}</li>
+    <li>Leaving: ${leaving}</li>
+    </ul>
+    <p>See you soon</p>
+    `,
+  }, cb);
+}
 
 function computeUserRatings(hotelId) {
   return RatingsModel.aggregate([
@@ -213,7 +249,8 @@ router.post('/hotel/:hotelId/room/:roomId/:begin/:end/reserve', (req, res) => {
     if (!hotel) {
       return res.status(404).send({ message: 'No such hotel!', type: 'danger' });
     }
-    if (!hotel.rooms.id(req.params.roomId)) {
+    const selectedRoom = hotel.rooms.id(req.params.roomId);
+    if (!selectedRoom) {
       return res.status(404).send({ message: 'No such room!', type: 'danger' });
     }
 
@@ -251,6 +288,11 @@ router.post('/hotel/:hotelId/room/:roomId/:begin/:end/reserve', (req, res) => {
     HotelModel.findOneAndUpdate(makeNewResConditions, makeNewResUpdates, { arrayFilters: [{ 'room._id': req.params.roomId }] },
       (err, hotel) => {
         if (err) return res.status(500).send({ message: err, type: 'danger' });
+        const { user } = req.session.passport;
+        sendEmail(user.username, user.email, selectedRoom.number_of_beds, req.params.begin, req.params.end, hotel.name, (err, info) => {
+          if (err) console.log(`Failed to send email ${err}`);
+          return console.log('Reservation notification sent...');
+        });
         return res.status(200).send({ message: 'successful reservation!', type: 'success' });
       });
   });
