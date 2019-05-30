@@ -1,7 +1,7 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { LoginService } from '../login.service';
-import { Alert } from '../reservation/reservation.component';
 import { FormControl, Validators } from '@angular/forms';
+import { AlertService } from '../alert.service';
 
 @Component({
   selector: 'app-signup',
@@ -9,14 +9,14 @@ import { FormControl, Validators } from '@angular/forms';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent implements OnInit {
-  @Input() activeDialog: Map<String, Boolean>;
-  @Input() alerts: Array<Alert>
 
+
+  @Output() switchTo = new EventEmitter<string>();
   username: FormControl;
   password: FormControl;
   email: FormControl;
 
-  constructor(private loginService: LoginService) { }
+  constructor(private loginService: LoginService, private alertService: AlertService) { }
 
   ngOnInit() {
     this.username = new FormControl('', [
@@ -34,15 +34,14 @@ export class SignupComponent implements OnInit {
 
   signup() {
     this.loginService.signup(this.username.value, this.email.value, this.password.value).subscribe((data: any) => {
-      this.alerts.push(data);
+      this.alertService.alert(data);
       this.navigateToLogin();
     }, (errResponse) => {
-      this.alerts.push(errResponse.error);
+      this.alertService.alert(errResponse.error);
     })
   }
 
   navigateToLogin() {
-    this.activeDialog.set("signup", false);
-    this.activeDialog.set("login", true);
+    this.switchTo.next("login");
   }
 }

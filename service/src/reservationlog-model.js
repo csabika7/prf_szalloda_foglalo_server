@@ -8,7 +8,10 @@ const ratingsSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId, required: true,
   },
-  rating: { type: Number, required: true },
-}, { collection: 'ratings' });
+  hotelName: { type: String },
+  roomNumberOfBeds: { type: String },
+  arrival: { type: String },
+  leaving: { type: String },
+}, { collection: 'reservationlog' });
 
-mongoose.model('rating', ratingsSchema);
+mongoose.model('reservationlog', ratingsSchema);

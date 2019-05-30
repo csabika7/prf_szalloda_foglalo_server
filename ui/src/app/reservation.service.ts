@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as moment from 'moment';
 
@@ -7,6 +6,14 @@ import * as moment from 'moment';
   providedIn: 'root'
 })
 export class ReservationService {
+  reservationLog() {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json'
+      })
+    };
+    return this.httpClient.get('http://localhost/v1/user/reservations', httpOptions);
+  }
 
   DATE_FORMAT: string;
 
@@ -18,33 +25,30 @@ export class ReservationService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json'
-      }),
-      //withCredentials: true
+      })
     };
     const fromDateParam = from.format(this.DATE_FORMAT);
     const toDateParam = to.format(this.DATE_FORMAT);
-    return this.httpClient.get(`http://prf-hotel-nodejs/v1/hotel/find?arrival=${fromDateParam}&leaving=${toDateParam}`, httpOptions);
+    return this.httpClient.get(`http://localhost/v1/hotel/find?arrival=${fromDateParam}&leaving=${toDateParam}`, httpOptions);
   }
 
   reserve(hotelId: string, roomId: string, from: moment.Moment, to: moment.Moment) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json'
-      }),
-      //withCredentials: true
+      })
     };
     const fromDateParam = from.format(this.DATE_FORMAT);
     const toDateParam = to.format(this.DATE_FORMAT);
-    return this.httpClient.post(`http://prf-hotel-nodejs/v1/hotel/${hotelId}/room/${roomId}/${fromDateParam}/${toDateParam}/reserve`, httpOptions);
+    return this.httpClient.post(`http://localhost/v1/hotel/${hotelId}/room/${roomId}/${fromDateParam}/${toDateParam}/reserve`, httpOptions);
   }
 
   rate(hotelId: string, userRating: Number) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json'
-      }),
-      //withCredentials: true
+      })
     };
-    return this.httpClient.post(`http://prf-hotel-nodejs/v1/hotel/${hotelId}/rate/${userRating}`, httpOptions);
+    return this.httpClient.post(`http://localhost/v1/hotel/${hotelId}/rate/${userRating}`, httpOptions);
   }
 }

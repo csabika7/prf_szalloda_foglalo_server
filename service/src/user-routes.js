@@ -3,6 +3,7 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 
 const UserModel = mongoose.model('user');
+const ReservationLogModel = mongoose.model('reservationlog');
 const router = express.Router();
 
 router.post('/user/register', (req, res) => {
@@ -31,11 +32,11 @@ router.post('/user/logout', (req, res) => {
 
 router.post('/user/login', (req, res) => {
   if (req.body.username && req.body.password) {
-    passport.authenticate('local', (error, username) => {
+    passport.authenticate('local', (error, user) => {
       if (error) {
         return res.status(403).send({ message: error, type: 'danger' });
       }
-      req.login(username, (error) => {
+      req.login(user, (error) => {
         if (error) return res.status(500).send({ message: error, type: 'danger' });
         return res.status(200).send({ message: 'login successful', type: 'success' });
       });
@@ -44,5 +45,21 @@ router.post('/user/login', (req, res) => {
     return res.status(403).send({ message: 'Username, password required', type: 'danger' });
   }
 });
+
+router.get('/user/reservations', (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(403).send({ message: 'You have to be logged in!', type: 'danger' });
+  }
+  ReservationLogModel.find({ userId: req.session.passport.user._id }, {
+    hotelName: 1,
+    roomNumberOfBeds: 1,
+    arrival: 1,
+    leaving: 1,
+  }, (err, reservations) => {
+    if (err) return res.status(500).send({ message: err, type: 'danger' });
+    return res.status(200).send(reservations);
+  });
+});
+
 
 module.exports = router;

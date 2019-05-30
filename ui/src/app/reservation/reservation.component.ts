@@ -1,13 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { NgbDate, NgbCalendar, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, Input } from '@angular/core';
+import { NgbDate, NgbCalendar, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ReservationService } from '../reservation.service';
 import * as moment from 'moment';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
-export interface Alert {
-  type: string;
-  message: string;
-}
+import { Alert, AlertService } from '../alert.service';
+import { AuthDialogComponent } from '../auth-dialog/auth-dialog.component';
 
 interface Room {
   _id: string,
@@ -32,12 +28,6 @@ interface Hotel {
 })
 export class ReservationComponent implements OnInit {
 
-  alerts: Array<Alert>; 
-
-  activeDialog: Map<String, Boolean>;
-  dialogCloseResult: string;
-  openedDialog: NgbModalRef;
-
   hoveredDate: NgbDate;
 
   fromDate: NgbDate;
@@ -49,7 +39,7 @@ export class ReservationComponent implements OnInit {
   hotels: Array<Hotel>;
 
   constructor(private calendar: NgbCalendar, private reservationService: ReservationService,
-    private modalService: NgbModal) { }
+    private alertService: AlertService, private modal: NgbModal) { }
 
   ngOnInit() {
     this.fromDate = this.calendar.getToday();
@@ -59,10 +49,6 @@ export class ReservationComponent implements OnInit {
     const nextYear = today.add(1, 'year');
     this.maxDate = new NgbDate(nextYear.year(), nextYear.month() + 1, nextYear.date() - 1)
     this.hotels = [];
-    this.activeDialog = new Map();
-    this.activeDialog.set("login", true);
-    this.activeDialog.set("signup", false);
-    this.alerts = [];
   }
 
   onDateSelection(date: NgbDate) {
@@ -92,19 +78,20 @@ export class ReservationComponent implements OnInit {
     this.reservationService.findHotels(this.arrivalDate(), this.leavingDate()).subscribe((data: any) => {
       this.hotels = data;
     }, (errResponse) => {
-      this.alerts.push(errResponse.error);
+      this.alertService.alert(errResponse.error);
     });
   }
 
-  reserve(hotelId: string, roomId: string, dialogContent: string) {
+  reserve(hotelId: string, roomId: string) {
     if(!localStorage.getItem("user")) {
-      this.alerts.push({ message: 'You have to be logged in reserve a room!', type: 'danger' })
-      return this.openDialog(dialogContent);
+      this.alertService.alert({ message: 'You have to be logged in reserve a room!', type: 'danger' });
+      this.modal.open(AuthDialogComponent);
+      return;
     }
     this.reservationService.reserve(hotelId, roomId, this.arrivalDate(), this.leavingDate()).subscribe((message: Alert) => {
-      this.alerts.push(message);
+      this.alertService.alert(message);
     }, (errResponse) => {
-      this.alerts.push(errResponse.error);
+      this.alertService.alert(errResponse.error);
     });
   }
 
@@ -116,30 +103,16 @@ export class ReservationComponent implements OnInit {
     return moment.utc({year: this.toDate.year, month: this.toDate.month - 1, day: this.toDate.day})
   }
 
-  openDialog(content: string) {
-    this.openedDialog = this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
-    this.openedDialog.result.then((result) => {
-      this.dialogCloseResult = `Closed with: ${result}`;
-    });
-  }
-
-  closeDialog(reason) {
-    this.openedDialog.close(reason);
-  }
-
-  close(alert: Alert) {
-    this.alerts.splice(this.alerts.indexOf(alert), 1);
-  }
-
-  rate(hotel: Hotel, dialogContent: string) {
+  rate(hotel: Hotel) {
     if(!localStorage.getItem("user")) {
-      this.alerts.push({ message: 'You have to be logged in reserve a room!', type: 'danger' })
-      return this.openDialog(dialogContent);
+      this.alertService.alert({ message: 'You have to be logged in reserve a room!', type: 'danger' });
+      this.modal.open(AuthDialogComponent);
+      return;
     }
     this.reservationService.rate(hotel._id, hotel.userRatings).subscribe((message: Alert) => {
-      this.alerts.push(message);
+      this.alertService.alert(message);
     }, (errResponse) => {
-      this.alerts.push(errResponse.error);
+      this.alertService.alert(errResponse.error);
     });
   }
 }

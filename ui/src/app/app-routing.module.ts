@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { LoginComponent } from './login/login.component';
-import { SignupComponent } from './signup/signup.component';
 import { ReservationComponent } from './reservation/reservation.component';
+import { UserComponent } from './user/user.component';
+import { AuthGuardService } from './auth-guard.service';
 
 const routes: Routes = [
   {path: 'reservation', component: ReservationComponent},
+  {path: 'user', component: UserComponent, canActivate: [AuthGuardService]},
 
   {path: '**', component: ReservationComponent}
 ];

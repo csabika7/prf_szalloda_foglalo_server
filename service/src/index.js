@@ -9,10 +9,10 @@ const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const cors = require('cors');
-require('./usermodel');
-require('./hotelmodel');
-require('./ratingsmodel');
+require('./user-model');
+require('./hotel-model');
+require('./ratings-model');
+require('./reservationlog-model');
 
 const UserModel = mongoose.model('user');
 
@@ -67,8 +67,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-app.use('/', require('./hotelroutes'));
-app.use('/', require('./authroutes'));
+app.use('/', require('./hotel-routes'));
+app.use('/', require('./user-routes'));
 
 app.listen(3000, () => {
   console.log('Server is running.');

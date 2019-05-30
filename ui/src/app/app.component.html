@@ -1,11 +1,22 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
+<div style="width: 35%; margin: auto;">
+  <button *ngIf="loggedIn() && (router.url === '/reservation' || router.url === '/')" class="btn btn-primary right" (click)="router.navigate(['/user'])">
+    User
+  </button>
+  <button *ngIf="!loggedIn() && (router.url === '/reservation' || router.url === '/')" class="btn btn-primary right" (click)="openAuthDialog()">
+    Sign in
+  </button>
+  <button *ngIf="router.url === '/user'" class="btn btn-primary right" (click)="router.navigate(['/reservation'])">
+    Make a reservation
+  </button>
 </div>
-<p *ngFor="let alert of alerts">
-  <ngb-alert [type]="alert.type" (close)="close(alert)">{{ alert.message }}</ngb-alert>
-</p>
+<div style="text-align:center; width: 30%; margin: auto; padding-top: 1em">
+  <h2>Welcome to {{ title }}!</h2>
+</div>
+<div id="alertPlaceHolder" class="alert-container">
+  <p *ngFor="let alert of alerts">
+    <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </p>
+</div>
 
 <router-outlet></router-outlet>

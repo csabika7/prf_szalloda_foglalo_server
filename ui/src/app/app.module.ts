@@ -6,16 +6,20 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SignupComponent } from './signup/signup.component';
 import { ReservationComponent } from './reservation/reservation.component';
+import { UserComponent } from './user/user.component';
+import { AuthDialogComponent } from './auth-dialog/auth-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     SignupComponent,
-    ReservationComponent
+    ReservationComponent,
+    UserComponent,
+    AuthDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -24,6 +28,9 @@ import { ReservationComponent } from './reservation/reservation.component';
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule
+  ],
+  entryComponents: [
+    AuthDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

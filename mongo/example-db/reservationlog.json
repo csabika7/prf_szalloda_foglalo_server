@@ -1,0 +1,2 @@
+{"_id":{"$oid":"5cef177bcaace03b5025169f"},"hotelId":{"$oid":"5cef0fd9928323356decddea"},"userId":{"$oid":"5ceed78c09202f05737fd2b3"},"hotelName":"Hotel Unknown","arrival":"2020-01-01","leaving":"2020-01-04","__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5cef18f6caace03b502516a0"},"hotelId":{"$oid":"5cef0fd9928323356decddea"},"userId":{"$oid":"5ceed78c09202f05737fd2b3"},"hotelName":"Hotel Unknown","arrival":"2019-05-29","leaving":"2019-06-02","__v":{"$numberInt":"0"}}

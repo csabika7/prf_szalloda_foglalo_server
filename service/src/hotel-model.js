@@ -7,17 +7,18 @@ const hotelSchema = new mongoose.Schema({
   },
   stars: { type: Number, required: true },
   userRatings: { type: Number, default: 0 },
-  extra_features: { type: [String] },
+  extraFeatures: { type: [String] },
   rooms: [{
-    number_of_beds: { type: Number },
-    extra_features: { type: [String] },
+    numberOfBeds: { type: Number },
+    extraFeatures: { type: [String] },
     available: { type: Number },
     reservations: [{
       year: Number,
+      dayOfYear: Number,
       guests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
       numberOfGuests: Number,
     }],
   }],
-}, { collection: 'hotels' });
+}, { collection: 'hotel' });
 
 mongoose.model('hotel', hotelSchema);

@@ -13,10 +13,9 @@ export class LoginService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json'
-      }),
-      //withCredentials: true
+      })
     };
-    return this.httpClient.post("http://prf-hotel-nodejs/v1/user/login",
+    return this.httpClient.post("http://localhost/v1/user/login",
     {username: username, password: password}, httpOptions);
   }
 
@@ -24,10 +23,9 @@ export class LoginService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json'
-      }),
-      //withCredentials: true
+      })
     };
-    return this.httpClient.post("http://prf-hotel-nodejs/v1/user/register",
+    return this.httpClient.post("http://localhost/v1/user/register",
     {username: username, email: email, password: password}, httpOptions);
   }
 }

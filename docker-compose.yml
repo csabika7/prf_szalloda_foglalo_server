@@ -4,6 +4,11 @@ services:
     image: mongo:4.0
     ports:
     - "27017:27017"
+  prf-hotel-mongo-example-db:
+    build:
+      context: mongo/
+    depends_on:
+    - prf-hotel-mongo
   prf-hotel-nodejs:
     build:
       context: service/
@@ -26,6 +31,6 @@ services:
     volumes:
     - "./nginx/nginx.conf:/etc/nginx/nginx.conf"
     ports:
-    - "8080:80"
+    - "80:80"
     depends_on:
     - prf-hotel-angular
