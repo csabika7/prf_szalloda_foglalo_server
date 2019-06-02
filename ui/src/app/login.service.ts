@@ -19,6 +19,10 @@ export class LoginService {
     {username: username, password: password}, httpOptions);
   }
 
+  logout() {
+    return this.httpClient.post("http://localhost/v1/user/logout", null);
+  }
+
   signup(username: string, email: string, password: string): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({

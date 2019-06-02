@@ -1,10 +1,8 @@
-<div id="reservations">
-  <h3>Your reservations</h3>
-  <div *ngFor="let res of reservations">
-    <h2>{{res.hotelName}}</h2>
-    Number of beds: {{res.roomNumberOfBeds}}<br>
-    Arrival: {{res.arrival}}<br>
-    Leaving: {{res.leaving}}<br>
-    <hr>
-  </div>
+<h3>Your reservations</h3>
+<div *ngFor="let res of reservations">
+  <h2>{{res.hotelName}}</h2>
+  Number of beds: {{res.roomNumberOfBeds}}<br>
+  Arrival: {{res.arrival}}<br>
+  Leaving: {{res.leaving}}<br>
+  <hr>
 </div>

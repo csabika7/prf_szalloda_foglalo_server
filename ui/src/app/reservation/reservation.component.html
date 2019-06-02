@@ -1,4 +1,4 @@
-<div id="searchTerms" style="margin: auto; width: 30%; text-align: center;">
+<div id="searchTerms">
   <ngb-datepicker #dp (select)="onDateSelection($event)" [minDate]="minDate" [maxDate]="maxDate" [displayMonths]="2" [dayTemplate]="t" outsideDays="hidden">
     </ngb-datepicker>
     
@@ -14,21 +14,21 @@
     </ng-template><br>
     <button class="btn btn-primary" (click)="findHotels()">Search</button>
 </div>
-<div id="searchResult"  style="margin: auto; width: 30%;">
+<div id="searchResult" >
   <div id="{{hotel._id}}" class="card" style="margin-bottom: 1em;" *ngFor="let hotel of hotels">
       <div class="card-body">
         <h3 class="card-title">{{hotel.name}}</h3>
         HOTEL FACILITIES:<br>
-        <span class="badge badge-dark" style="margin-right: .25em;" *ngFor="let feature of hotel.extra_features">{{feature}}</span><br>
+        <span class="badge badge-dark" style="margin-right: .25em;" *ngFor="let feature of hotel.extraFeatures">{{feature}}</span><br>
         Stars: <ngb-rating [(rate)]="hotel.stars" [readonly]="true" [max]="5"></ngb-rating><br>
         User ratings: <ngb-rating [(rate)]="hotel.userRatings" (rateChange)="rate(hotel, authDiagContent)" [max]="5"></ngb-rating><br>
         Available rooms:
         <hr>
         <div id="{{room._id}}" *ngFor="let room of hotel.rooms">
           <button class="btn btn-primary" style="float: right" (click)="reserve(hotel._id, room._id, authDiagContent)" *ngIf="room.remaining > 0">Reserve</button>
-          Number of beds: {{room.number_of_beds}}<br>
+          Number of beds: {{room.numberOfBeds}}<br>
           ROOM FACILITIES:<br>
-          <span class="badge badge-secondary" style="margin-right: .25em;" *ngFor="let feature of room.extra_features">{{feature}}</span><br>
+          <span class="badge badge-secondary" style="margin-right: .25em;" *ngFor="let feature of room.extraFeatures">{{feature}}</span><br>
           Still available:
           <span class="badge badge-success" *ngIf="room.remaining > 0">{{room.remaining}}</span>
           <span class="badge badge-danger" *ngIf="room.remaining === 0">{{room.remaining}}</span><br>

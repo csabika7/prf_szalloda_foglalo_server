@@ -1,22 +1,25 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="width: 35%; margin: auto;">
-  <button *ngIf="loggedIn() && (router.url === '/reservation' || router.url === '/')" class="btn btn-primary right" (click)="router.navigate(['/user'])">
-    User
-  </button>
-  <button *ngIf="!loggedIn() && (router.url === '/reservation' || router.url === '/')" class="btn btn-primary right" (click)="openAuthDialog()">
-    Sign in
-  </button>
-  <button *ngIf="router.url === '/user'" class="btn btn-primary right" (click)="router.navigate(['/reservation'])">
-    Make a reservation
-  </button>
-</div>
-<div style="text-align:center; width: 30%; margin: auto; padding-top: 1em">
+<div style="text-align:center; width: 30%; margin: auto;">
   <h2>Welcome to {{ title }}!</h2>
 </div>
-<div id="alertPlaceHolder" class="alert-container">
+<div style="text-align:right; width: 30%; margin: auto;">
+  <button *ngIf="!loggedIn() && (router.url === '/reservation' || router.url === '/')" class="btn btn-primary" (click)="openAuthDialog()">
+    Sign in
+  </button>
+
+  <button *ngIf="loggedIn() && (router.url === '/reservation' || router.url === '/')" class="btn btn-primary" (click)="router.navigate(['/user'])">
+    Your reservations
+  </button>
+  <button *ngIf="router.url === '/user'" class="btn btn-primary" (click)="router.navigate(['/reservation'])">
+    Make a reservation
+  </button>
+  <button *ngIf="loggedIn()" class="btn btn-primary" style="margin-left: 5px" (click)="logout()">Sign out</button>
+</div>
+<div id="alertPlaceHolder" class="alert-container" style="position: fixed; top: 0; right: 0;">
   <p *ngFor="let alert of alerts">
     <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
   </p>
 </div>
 
-<router-outlet></router-outlet>
+<div style="margin: auto;width: 30%;text-align: center;">
+  <router-outlet></router-outlet>
+</div>
