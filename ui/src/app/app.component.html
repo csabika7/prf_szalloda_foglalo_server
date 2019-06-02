@@ -3,7 +3,7 @@
 </div>
 <div style="text-align:right; width: 30%; margin: auto;">
   <button *ngIf="!loggedIn() && (router.url === '/reservation' || router.url === '/')" class="btn btn-primary" (click)="openAuthDialog()">
-    Sign in
+    Sign in / Sign up
   </button>
 
   <button *ngIf="loggedIn() && (router.url === '/reservation' || router.url === '/')" class="btn btn-primary" (click)="router.navigate(['/user'])">

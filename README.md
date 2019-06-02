@@ -12,6 +12,10 @@ To start the app go to the root of the project and execute:
 ```bash
 docker-compose up -d
 ```
+To stop the app execute:
+```bash
+docker-compose down;
+```
 This command will start the following docker containers:<br>
 - prf-hotel-nodejs:1.0
 - prf-hotel-angular:1.0
@@ -20,7 +24,7 @@ This command will start the following docker containers:<br>
 
 It also starts up a temporary container that fills up the mongodb with the example db.<br>
 
-The nginx server in this setup is used as a reverse proxy. It is used so that CORS is not a problem when accessing the nodjs REST API from the angular app.
+The nginx server in this setup is used as a reverse proxy. It is used so that CORS is not a problem when accessing the nodejs REST API from the angular app.
 
 # Configuration
 The docker-compose.yml file contains to unfilled environment variables: EMAIL_USER, EMAIL_PASS.<br>
