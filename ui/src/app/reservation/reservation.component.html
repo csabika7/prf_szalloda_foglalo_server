@@ -14,7 +14,7 @@
     </ng-template><br>
     <button class="btn btn-primary" (click)="findHotels()">Search</button>
 </div>
-<div id="searchResult" >
+<div id="searchResult" style="text-align: left">
   <div id="{{hotel._id}}" class="card" style="margin-bottom: 1em;" *ngFor="let hotel of hotels">
       <div class="card-body">
         <h3 class="card-title">{{hotel.name}}</h3>
@@ -27,6 +27,7 @@
         <div id="{{room._id}}" *ngFor="let room of hotel.rooms">
           <button class="btn btn-primary" style="float: right" (click)="reserve(hotel._id, room._id, authDiagContent)" *ngIf="room.remaining > 0">Reserve</button>
           Number of beds: {{room.numberOfBeds}}<br>
+          Price per night: {{room.price}}$<br>
           ROOM FACILITIES:<br>
           <span class="badge badge-secondary" style="margin-right: .25em;" *ngFor="let feature of room.extraFeatures">{{feature}}</span><br>
           Still available:

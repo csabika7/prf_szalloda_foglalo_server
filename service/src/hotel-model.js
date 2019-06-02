@@ -12,6 +12,7 @@ const hotelSchema = new mongoose.Schema({
     numberOfBeds: { type: Number },
     extraFeatures: { type: [String] },
     available: { type: Number },
+    price: { type: Number },
     reservations: [{
       year: Number,
       dayOfYear: Number,

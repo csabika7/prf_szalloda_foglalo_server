@@ -115,6 +115,7 @@ router.get('/hotel/list', (req, res) => {
     extraFeatures: 1,
     'rooms._id': 1,
     'rooms.numberOfBeds': 1,
+    'rooms.price': 1,
     'rooms.extraFeatures': 1,
   }, (error, hotels) => {
     if (error) {
@@ -154,7 +155,6 @@ router.get('/hotel/find', (req, res) => {
     conditions.rooms.$elemMatch = roomConditions;
   }
 
-
   HotelModel.find(conditions, {
     _id: 1,
     stars: 1,
@@ -164,21 +164,35 @@ router.get('/hotel/find', (req, res) => {
     'rooms._id': 1,
     'rooms.numberOfBeds': 1,
     'rooms.available': 1,
+    'rooms.price': 1,
     'rooms.extraFeatures': 1,
     'rooms.reservations.year': 1,
+    'rooms.reservations.dayOfYear': 1,
     'rooms.reservations.numberOfGuests': 1,
   }, (error, hotels) => {
     if (error) return res.status(500).send({ message: error });
     return res.status(200).send(hotels.filter(hotel => !!hotel.rooms.filter((room) => {
-      let oneEmptyRoomForInterval = true;
-      for (let i = beginDate.dayOfYear() - 1; i < endDate.dayOfYear(); i += 1) {
-        oneEmptyRoomForInterval = oneEmptyRoomForInterval && (room.reservations[i].year < today.year()
-          || room.reservations[i].year >= today.year() && room.reservations[i].numberOfGuests < room.available);
+      for (let date = beginDate.clone(); date.isBefore(endDate); date.add(1, 'day')) {
+        const i = date.subtract(1, 'day').dayOfYear();
+        date.add(1, 'day');
+        if (date.isBefore(today)) {
+          if (room.reservations[i].year > today.year()) {
+            if (room.reservations[i].numberOfGuests === room.available) {
+              return false;
+            }
+          }
+        } else if (room.reservations[i].year >= today.year()) {
+          if (room.reservations[i].numberOfGuests === room.available) {
+            return false;
+          }
+        }
       }
-      return oneEmptyRoomForInterval;
+      return true;
     })).map((hotel) => {
       hotel.rooms.forEach((room) => {
-        room.set('remaining', room.available - room.reservations.map(res => res.numberOfGuests).reduce((a, b) => (a > b ? a : b)), { strict: false });
+        room.set('remaining', room.available - room.reservations
+          .filter(reserv => reserv.dayOfYear >= beginDate.dayOfYear() && reserv.dayOfYear < endDate.dayOfYear())
+          .map(reserv => reserv.numberOfGuests).reduce((a, b) => (a > b ? a : b)), { strict: false });
         room.set('reservations', undefined);
         room.set('available', undefined);
       });
@@ -308,6 +322,7 @@ router.post('/hotel/:hotelId/room/:roomId/:arrival/:leaving/reserve', (req, res)
       for (let date = arrivalDate.clone(); date.isBefore(leavingDate.dayOfYear()); date.add(1, 'days')) {
         conditions[`reservations.${date.dayOfYear() - 1}.numberOfGuests`] = { $lt: hotel.rooms.id(req.params.roomId).available };
       }
+      // making reservation
       HotelModel.findOneAndUpdate(conditions,
         {
           $inc: { 'rooms.$[room].reservations.$[res].numberOfGuests': 1 },
