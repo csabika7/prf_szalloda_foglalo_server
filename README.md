@@ -121,9 +121,19 @@ hotelId: identifier of the hotel to which a new type of room is to be added<br>
 
 + **POST /hotel/:hotelId/room/:roomId/:arrival/:leaving/reserve**
 This endpoint will reserve a room in a hotel for the given date interval.
-*Content type:* application/json<br>
 *Path parameters:*<br>
 hotelId: identifier of the hotel where the room is to be reserved<br>
 roomId: identifier of the room to be reserved<br>
 arrival: date of the check-in to the hotel. format: YYYY-MM-DD.<br>
 leaving: date of the check-out from the hotel. format: YYYY-MM-DD
+
++ **GET /hotel/:hotelId/ratings**
+This endpoint returns the user ratings for a hotel.
+*Path parameters:*<br>
+hotelId: identifier of the hotel<br>
+
++ **POST /hotel/:hotelId/rate/:rating**
+This endpoint adds the currently logged in user's rating to the given hotel.
+*Path parameters:*<br>
+hotelId: identifier of the hotel<br>
+rating: number between 1-5
