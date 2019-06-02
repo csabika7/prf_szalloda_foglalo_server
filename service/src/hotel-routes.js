@@ -237,13 +237,11 @@ router.post('/hotel/:hotelId/rate/:rating', (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(403).send({ message: 'You have to be logged in to rate hotels!', type: 'danger' });
   }
-  console.log('rating');
   RatingsModel.update({ hotelId: req.params.hotelId, userId: req.session.passport.user._id },
     { rating: req.params.rating }, { upsert: true }, (ratingsUpdateError) => {
       if (ratingsUpdateError) return res.status(500).send({ message: ratingsUpdateError, type: 'danger' });
       computeUserRatings(req.params.hotelId).then((agg) => {
         if (agg.length === 1) {
-          console.log(agg);
           HotelModel.update({ _id: req.params.hotelId }, { userRatings: agg[0].ratings },
             (hotelUpdateError, doc) => {
               if (hotelUpdateError) console.log(`error updating ratings in hotel ${req.params.hotelId}: ${hotelUpdateError}`);
@@ -307,9 +305,9 @@ router.post('/hotel/:hotelId/room/:roomId/:arrival/:leaving/reserve', (req, res)
           { $and: [{ 'res.dayOfYear': { $gte: today.dayOfYear() } }, { 'res.year': { $lt: today.year() } }] },
         ],
       })).then((doc) => {
-      const conditions = { _id: req.params.hotelId };
-      for (let date = arrivalDate.clone(); date.isBefore(leavingDate.dayOfYear()); date.add(1, 'days')) {
-        conditions[`reservations.${date.dayOfYear() - 1}.numberOfGuests`] = { $lt: hotel.rooms.id(req.params.roomId).available };
+      const conditions = { _id: req.params.hotelId, rooms: { $elemMatch: { _id: req.params.roomId } } };
+      for (let date = arrivalDate.clone(); date.isBefore(leavingDate); date.add(1, 'days')) {
+        conditions.rooms.$elemMatch[`reservations.${date.dayOfYear() - 1}.numberOfGuests`] = { $lt: hotel.rooms.id(req.params.roomId).available };
       }
       // making reservation
       HotelModel.findOneAndUpdate(conditions,
@@ -324,6 +322,7 @@ router.post('/hotel/:hotelId/room/:roomId/:arrival/:leaving/reserve', (req, res)
           ],
         }, (err, hotel) => {
           if (err) return res.status(500).send({ message: err, type: 'danger' });
+          if (!hotel) return res.status(400).send({ message: 'Reservation is not possible for the selected dates!', type: 'danger' });
           const { user } = req.session.passport;
           sendEmail(user.username, user.email, selectedRoom.numberOfBeds, req.params.begin, req.params.end, hotel.name, (err, info) => {
             if (err) {

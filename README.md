@@ -30,6 +30,10 @@ The nginx server in this setup is used as a reverse proxy. It is used so that CO
 The docker-compose.yml file contains to unfilled environment variables: EMAIL_USER, EMAIL_PASS.<br>
 The application sends out emails for each reservation. These env vars will be used for sending the emails (the email needs to be a gmail account).
 
+Test user:<br>
+username: alex<br>
+password: pass<br>
+
 # Service API
 The service directory contains the node.js app serving as a REST API.
 ## Available endpoints:
