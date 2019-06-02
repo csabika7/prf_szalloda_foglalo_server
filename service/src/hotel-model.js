@@ -6,12 +6,16 @@ const hotelSchema = new mongoose.Schema({
     type: String, unique: true, required: true,
   },
   city: { type: String, required: true },
-  stars: { type: Number, required: true },
-  userRatings: { type: Number, default: 0 },
-  extraFeatures: { type: [String] },
+  stars: {
+    type: Number, required: true, min: 1, max: 5,
+  },
+  userRatings: {
+    type: Number, default: 0, min: 1, max: 5,
+  },
+  extraFeatures: { type: [String], default: [] },
   rooms: [{
     numberOfBeds: { type: Number },
-    extraFeatures: { type: [String] },
+    extraFeatures: { type: [String], default: [] },
     available: { type: Number },
     price: { type: Number },
     reservations: [{
