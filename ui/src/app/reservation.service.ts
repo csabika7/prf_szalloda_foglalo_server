@@ -21,7 +21,7 @@ export class ReservationService {
     this.DATE_FORMAT = "YYYY-MM-DD"
   }
 
-  findHotels(from: moment.Moment, to: moment.Moment) {
+  findHotels(from: moment.Moment, to: moment.Moment, cityName: string) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json'
@@ -29,7 +29,15 @@ export class ReservationService {
     };
     const fromDateParam = from.format(this.DATE_FORMAT);
     const toDateParam = to.format(this.DATE_FORMAT);
-    return this.httpClient.get(`http://localhost/v1/hotel/find?arrival=${fromDateParam}&leaving=${toDateParam}`, httpOptions);
+
+    let optionalParameters = "";
+    console.log(cityName);
+    console.log(cityName && cityName !== "");
+    if(cityName && cityName !== "") {
+      optionalParameters = `&city=${cityName}`
+    }
+
+    return this.httpClient.get(`http://localhost/v1/hotel/find?arrival=${fromDateParam}&leaving=${toDateParam}${optionalParameters}`, httpOptions);
   }
 
   reserve(hotelId: string, roomId: string, from: moment.Moment, to: moment.Moment) {

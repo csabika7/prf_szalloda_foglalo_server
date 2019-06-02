@@ -28,6 +28,8 @@ interface Hotel {
 })
 export class ReservationComponent implements OnInit {
 
+  cityName: string;
+
   hoveredDate: NgbDate;
 
   fromDate: NgbDate;
@@ -75,7 +77,7 @@ export class ReservationComponent implements OnInit {
   }
 
   findHotels() {
-    this.reservationService.findHotels(this.arrivalDate(), this.leavingDate()).subscribe((data: any) => {
+    this.reservationService.findHotels(this.arrivalDate(), this.leavingDate(), this.cityName).subscribe((data: any) => {
       this.hotels = data;
     }, (errResponse) => {
       this.alertService.alert(errResponse.error);

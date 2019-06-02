@@ -5,6 +5,7 @@ const hotelSchema = new mongoose.Schema({
   name: {
     type: String, unique: true, required: true,
   },
+  city: { type: String, required: true },
   stars: { type: Number, required: true },
   userRatings: { type: Number, default: 0 },
   extraFeatures: { type: [String] },

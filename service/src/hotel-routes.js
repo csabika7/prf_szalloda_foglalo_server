@@ -112,6 +112,7 @@ router.get('/hotel/list', (req, res) => {
     stars: 1,
     userRatings: 1,
     name: 1,
+    city: 1,
     extraFeatures: 1,
     'rooms._id': 1,
     'rooms.numberOfBeds': 1,
@@ -126,7 +127,6 @@ router.get('/hotel/list', (req, res) => {
 });
 
 router.get('/hotel/find', (req, res) => {
-  const conditions = {};
   if (!req.query.arrival || !req.query.leaving) {
     return res.status(400).send({ message: 'Arrival and leaving date must be given!', type: 'danger' });
   }
@@ -138,21 +138,9 @@ router.get('/hotel/find', (req, res) => {
     return fauilre;
   }
 
-  if (req.query.name) {
-    conditions.name = { $regex: req.query.name, $options: 'i' };
-  }
-  if (req.query.extraFeatures && req.query.extraFeatures.length > 0) {
-    conditions.extraFeatures = { $all: req.query.extraFeatures };
-  }
-  if (req.query.numberOfBeds || req.query.roomExtraFeatures) {
-    const roomConditions = {};
-    if (req.query.numberOfBeds) {
-      roomConditions.numberOfBeds = { $eq: req.query.numberOfBeds };
-    }
-    if (req.query.roomExtraFeatures && req.query.roomExtraFeatures.length > 0) {
-      roomConditions.roomExtraFeatures = { $all: req.query.roomExtraFeatures };
-    }
-    conditions.rooms.$elemMatch = roomConditions;
+  const conditions = {};
+  if (req.query.city) {
+    conditions.city = { $regex: req.query.city, $options: 'i' };
   }
 
   HotelModel.find(conditions, {
@@ -160,6 +148,7 @@ router.get('/hotel/find', (req, res) => {
     stars: 1,
     userRatings: 1,
     name: 1,
+    city: 1,
     extraFeatures: 1,
     'rooms._id': 1,
     'rooms.numberOfBeds': 1,
